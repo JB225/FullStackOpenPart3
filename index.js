@@ -1,8 +1,18 @@
 const express = require('express')
 const app = express()
+var morgan = require('morgan')
 
 app.set('json spaces', 2)
 app.use(express.json())
+
+
+morgan.token('body', function(req, res) {
+  if (res.req.method === 'POST') {
+    return JSON.stringify(res.req.body)
+  } else {
+    return " "
+  }})
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
 
 let phoneNumbers = [
     { 
@@ -50,6 +60,25 @@ app.get('/info', (request, response) => {
 
 app.post('/api/persons', (request, response) => {
   const newPerson = request.body
+  const names = phoneNumbers.map(person => person.name)
+
+  if (!newPerson.number) {
+    return response.status(400).json({
+      error: 'number is missing'
+    })
+  }
+
+  if (!newPerson.name) {
+    return response.status(400).json({
+      error: 'name is missing'
+    })
+  } else if (names.includes(newPerson.name)) {
+    return response.status(400).json({
+      error: 'name must be unique'
+    })
+  }
+
+
   const ids = phoneNumbers.map(person => person.id)
   let randomID = Math.floor(Math.random() * 10000)
 
