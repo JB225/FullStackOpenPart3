@@ -1,5 +1,7 @@
+require('dotenv').config()
 const express = require('express')
 const app = express()
+const Person = require('./models/person')
 
 app.use(express.static('build'))
 
@@ -9,7 +11,6 @@ app.use(cors())
 var morgan = require('morgan')
 app.set('json spaces', 2)
 app.use(express.json())
-
 
 morgan.token('body', function(req, res) {
   if (res.req.method === 'POST') {
@@ -43,7 +44,9 @@ let phoneNumbers = [
 ]
 
 app.get('/api/persons', (request, response) => {
-    response.json(phoneNumbers)
+  Person.find({}).then(persons => {
+    response.json(persons)
+  })
 })
 
 app.get('/api/persons/:id', (request, response) => {
@@ -58,9 +61,11 @@ app.get('/api/persons/:id', (request, response) => {
 })
 
 app.get('/info', (request, response) => {
+  Person.find({}).then(persons => {
     response.send(`
-        <p>Phonebook has info for ${phoneNumbers.length}</p>
+        <p>Phonebook has info for ${persons.length}</p>
         <p>${new Date()}</p>`)
+  })
 })
 
 app.post('/api/persons', (request, response) => {
@@ -77,12 +82,12 @@ app.post('/api/persons', (request, response) => {
     return response.status(400).json({
       error: 'name is missing'
     })
-  } else if (names.includes(newPerson.name)) {
+  } 
+  else if (names.includes(newPerson.name)) {
     return response.status(400).json({
       error: 'name must be unique'
     })
   }
-
 
   const ids = phoneNumbers.map(person => person.id)
   let randomID = Math.floor(Math.random() * 10000)
@@ -107,7 +112,7 @@ app.delete('/api/persons/:id', (request, response) => {
   response.status(204).end()
 })
 
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
 })
