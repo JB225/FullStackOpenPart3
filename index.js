@@ -25,7 +25,7 @@ morgan.token('body', function(req, res) {
   if (res.req.method === 'POST') {
     return JSON.stringify(res.req.body)
   } else {
-    return " "
+    return ' '
   }})
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
 
@@ -66,7 +66,7 @@ app.delete('/api/persons/:id', (request, response, next) => {
       } else {
         response.status(400).end()
       }
-  }).catch(error => next(error))
+    }).catch(error => next(error))
 })
 
 // Creates a new user in the database
@@ -78,8 +78,8 @@ app.post('/api/persons', (request, response, next) => {
     number: newPerson.number
   })
 
-  newPersonObject.save().then(result => {
-      response.json(newPersonObject)
+  newPersonObject.save().then(() => {
+    response.json(newPersonObject)
   }).catch(error => next(error))
 })
 
@@ -113,5 +113,5 @@ app.use(errorHandler)
 // Listens on given port number
 const PORT = process.env.PORT
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`)
+  console.log(`Server running on port ${PORT}`)
 })
